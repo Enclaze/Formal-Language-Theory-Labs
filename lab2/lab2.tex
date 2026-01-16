@@ -1,0 +1,222 @@
+\documentclass[12pt]{article}
+% Поля
+%-------------------------------------------------------------------
+\usepackage{geometry}
+\geometry{a4paper,tmargin=2cm,bmargin=2cm,lmargin=2cm,rmargin=2cm}
+%-------------------------------------------------------------------
+
+% Интервал
+%--------------------------------------
+\linespread{1}                    
+%--------------------------------------
+
+%Выравнивание и переносы
+%--------------------------------------
+\usepackage{needspace}
+\sloppy
+\clubpenalty=10000
+\widowpenalty=10000
+%--------------------------------------
+
+% Поддержка русского языка
+%-------------------------------------------------------------------
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc} 
+\usepackage[english, main=russian]{babel}
+%-------------------------------------------------------------------
+
+% Математические символы
+%-------------------------------------------------------------------
+\usepackage{amsmath, amsthm, amssymb, tikz-cd}
+\usepackage{amssymb}
+\usepackage{physics}
+%-------------------------------------------------------------------
+\usepackage{float}
+\usepackage{adjustbox}
+\usepackage{booktabs}
+\usepackage{rotating}
+\usepackage{array}
+\newcolumntype{C}{>{\centering\arraybackslash}p{0.8em}}
+
+
+\begin{document}
+
+\clearpage
+\newpage
+
+\section{Задание}
+Дано следующее академическое регулярное выражение:
+
+\begin{center}
+$((aa|ab|cc)^*aba(aaa|bcc)^*)^*((abac|(cc)^*)(b|ca))^*$
+\end{center}
+
+\noindent По имеющемуся академическому регулярному выражению построить
+\begin{itemize}
+    
+    \item{минимальный ДКА, распознающий его язык (минимальность обосновать таблицей классов эквивалентности)}
+    
+    \item{возможно малый НКА, распознающий его язык. Возможно малый переключающийся (с конъюнкцией) КА, распознающий его язык. Частично обосновать таблицами множеств классов эквивалентности.}
+    
+    \item{расширенное регулярное выражение, распознающее тот же язык. В расширенном выражении можно использовать:
+    \begin{itemize}
+
+        \item{wildcard-операцию для замены произвольного алфавита;}
+         
+        \item{положительную итерацию $\tau^+$ и опцию $\tau?.\tau^+ = \tau\tau^*,\tau? = (\tau|\varepsilon)$;}
+        
+        \item{операции предпросмотра $\tau_0(?=\tau_1)\tau_2 \equiv \tau_0((\tau_1.^*)\cap\tau_2)$ и ретроспективной проверки $\tau_0(?<= \tau_1)\tau_2 \equiv (\tau_0 \cup (\tau_1.^*))\tau_2$, а также их отрицательные версии $\tau_0(?!\tau_1)\tau_2 \equiv \tau_0(\overline{(\tau_1.^*)}\cap \tau_2)$ и $\tau_0(?<!\tau_1)\tau_2 \equiv (\tau_0 \cap \overline{(\tau_1.^*)})\tau_2$;}
+        
+        \item{классы букв $[c_1\dots c_k] \equiv (c_1|c_2|\dots|c_k)$ и их дополнения $[\string^ c_1\dots c_k]$;}
+        
+        \item{(обязательно) маркеры начала и конца выражения \string^ и \$.}
+    \end{itemize}
+    }
+\end{itemize}
+
+Провести автоматическое тестирование предполагаемой эквивалентности построенных распознавателей. Тем самым необходимо построить алгоритмы, определяющие принадлежность слова языку академического регулярного выражения, ДКА, НКА и ПКА.
+
+Эквивалентность расширенного регулярного выражения тестировать не обязательно (на дополнительный балл). Если не делать, то для расширенного регулярного выражения достаточно описать содержательно (полуформально), почему оно должно распознавать тот же самый язык.
+
+Требуется только фазз-тестирование эквивалентности: строится случайное слово $\omega$ и проверяется, принадлежит ли оно языкам регулярного выражения, ДКА, НКА и ПКА согласованно.
+
+
+\section{Минимальный ДКА}
+
+\begin{figure}[H]
+    \centering
+    \begin{adjustbox}{width=\textwidth}
+    \input{DFA.tex}
+    \end{adjustbox}
+    \caption{Минимальный ДКА}
+    \label{fig:dfa}
+\end{figure}
+
+Таблица классов эквивалентности:
+
+\begin{table}[h]
+\caption{Таблица эквивалентности (строки - префиксы, столбцы - суффиксы)}
+\centering
+\begin{tabular}{l|*{14}{c|}}
+\cline{2-15}
+ & $\varepsilon$ & aaa & aba & cc & ba & a & b & bacb & c & acb & cb & aa & caba & ccb \\ \hline
+\multicolumn{1}{|l|}{$\varepsilon$} & + & - & + & - & - & - & + & - & - & - & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{a} & - & - & - & - & + & - & - & + & - & - & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{b} & + & - & - & - & - & - & + & - & - & - & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{c} & - & - & - & - & - & + & - & - & - & - & + & - & + & - \\ \hline
+\multicolumn{1}{|l|}{aa} & - & - & + & - & - & - & - & - & - & - & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{ab} & - & - & + & - & - & + & - & - & - & + & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{ac} & - & - & - & - & - & - & - & - & - & - & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{ba} & - & - & - & - & - & - & - & + & - & - & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{bc} & - & - & - & - & - & + & - & - & - & - & + & - & - & - \\ \hline
+\multicolumn{1}{|l|}{cc} & - & - & + & - & - & - & + & - & - & - & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{aaa} & - & - & - & - & + & - & - & - & - & - & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{aac} & - & - & - & - & - & - & - & - & - & - & - & - & + & - \\ \hline
+\multicolumn{1}{|l|}{aba} & + & + & + & - & + & - & + & - & - & - & + & - & - & + \\ \hline
+\multicolumn{1}{|l|}{bab} & - & - & - & - & - & - & - & - & - & + & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{bcc} & - & - & - & - & - & - & + & - & - & - & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{aaab} & - & - & + & - & - & + & - & - & - & - & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{abaa} & - & - & + & - & + & - & - & + & - & - & - & + & - & - \\ \hline
+\multicolumn{1}{|l|}{abab} & + & - & + & + & - & + & + & - & - & - & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{abac} & - & - & - & - & - & + & + & - & - & - & + & - & + & - \\ \hline
+\multicolumn{1}{|l|}{baba} & - & - & - & - & - & - & - & - & - & - & + & - & - & - \\ \hline
+\multicolumn{1}{|l|}{aaaba} & + & + & + & - & + & - & + & - & - & - & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{abaaa} & - & - & + & - & + & + & - & - & - & - & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{ababa} & + & + & + & - & + & - & + & + & - & - & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{ababc} & - & - & - & - & - & + & - & - & + & - & + & - & + & - \\ \hline
+\multicolumn{1}{|l|}{abacc} & - & - & + & - & - & + & + & - & - & - & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{babac} & - & - & - & - & - & - & + & - & - & - & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{ababab} & + & - & + & + & - & + & + & - & - & + & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{ababcc} & + & + & + & - & - & - & + & - & - & - & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{abacca} & + & - & - & - & + & - & + & - & - & - & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{babacc} & - & - & - & - & - & + & - & - & - & - & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{abababa} & + & + & + & - & + & - & + & + & - & - & + & - & - & + \\ \hline
+\multicolumn{1}{|l|}{ababcca} & - & - & - & - & + & - & - & + & - & - & - & + & - & - \\ \hline
+\multicolumn{1}{|l|}{ababccb} & + & - & - & + & - & - & + & - & - & - & - & - & - & + \\ \hline
+\multicolumn{1}{|l|}{abaccaa} & - & - & + & - & - & - & - & + & - & - & - & - & - & - \\ \hline
+\multicolumn{1}{|l|}{abaccab} & + & - & + & - & - & + & + & - & - & - & - & - & - & + \\ \hline
+\end{tabular}
+\end{table}
+
+\clearpage
+\newpage
+
+\section{Меньший НКА}
+
+\begin{figure}[H]
+    \centering
+    \begin{adjustbox}{width=\textwidth}
+    \input{NFA.tex}
+    \end{adjustbox}
+    \caption{Редуцированный автомат Глушкова}
+    \label{fig:nfa}
+\end{figure}
+
+Таблица эквивалентности:
+
+\begin{table}[h]
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+        & $\varepsilon$ & ba     & cb     & cc     & acb    \\ \hline
+$\varepsilon$ & +          & -      & -      & -      & -      \\ \hline
+a       & -          & +      & -      & -      & -      \\ \hline
+aba     & +          & +      & +      & -      & -      \\ \hline
+abab    & +          & -      & -      & +      & -      \\ \hline
+ababab  & +          & -      & -      & +      & +      \\ \hline
+\end{tabular}
+\end{table}
+\section{Переключающийся автомат}
+
+\begin{figure}[H]
+    \centering
+    \begin{adjustbox}{width=\textwidth}
+    \input{AFA.tex}
+    \end{adjustbox}
+    \caption{Переключающийся автомат}
+    \label{fig:afa}
+\end{figure}
+
+Таблица эквивалентности:
+
+\begin{table}[h]
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+           & c & $\varepsilon$ & accabb     & a & ababbbb    \\ \hline
+ababab     & -          & +          & +         & +   &  +  \\ \hline
+ab         & -          & -          & +         & +   &  +  \\ \hline
+ccccab     & -          & -          & -         & +   &  +  \\ \hline
+cc         & -          & -          & -         & -   &  +  \\ \hline
+bbc        & -          & -          & -         & +   &  -  \\ \hline
+\end{tabular}
+\end{table}
+
+\newpage
+
+Проверяется выполнение следующих инвариантов:
+
+I1: остутствие подстроки bcb;
+
+I2: строка не может заканчиваться на ac или bc.
+
+\section{Расширенное регулярное выражение}
+Исходное регулярное выражение:
+
+$((aa|ab|cc)^*aba(aaa|bcc)^*)^*((abac|(cc)^*)(b|ca))^*$
+
+Заметим, что подстроку $(aa|ab|cc)$ можно заменить на $(a[ab]|cc)$, а $[ab]$ можно поменять на дополнение $[\string^ c]$. Получим в итоге такое выражение:
+
+$((a[\string^ c]|cc)^*aba(aaa|bcc)^*)^*((abac|(cc)^*)(b|ca))^*$
+
+Далее, добавляем символы начала и конца выражения и получаем расширенное регулярное выражение:
+
+$\string^ ((a[\string^ c]|cc)^*aba(aaa|bcc)^*)^*((abac|(cc)^*)(b|ca))^*$\$
+
+\begin{itemize}
+    \item{wildcard-операцию применить нигде не получится.}
+
+    \item{Положительная итерация и опция не имеют смысла потому, что у нас нет ситуации $\tau \tau^*$}
+
+    \item{Операции предпросмотра, ретроспективной проверки и их отрицательные версии тоже не имеют смысла, потому что ничего не упростят, а только усложнят регулярное выражение.}
+\end{itemize}
+
+\end{document}
